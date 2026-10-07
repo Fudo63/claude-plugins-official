@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rheinklar - Hauswartungs App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e40af;
+            --secondary: #0891b2;
+            --success: #16a34a;
+            --warning: #ea580c;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f172a;
+                --card: #1e293b;
+                --text: #f1f5f9;
+                --text-light: #cbd5e1;
+                --border: #334155;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 12px 15px;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.3);
+            font-weight: 500;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .user-info {
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #f97316 100%);
+        }
+
+        .stat-card.success {
+            background: linear-gradient(135deg, var(--success) 0%, #22c55e 100%);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            background: var(--card);
+            color: var(--text);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: opacity 0.3s;
+            font-size: 14px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button.secondary {
+            background: var(--text-light);
+        }
+
+        button.success {
+            background: var(--success);
+        }
+
+        button.warning {
+            background: var(--warning);
+        }
+
+        button.danger {
+            background: var(--danger);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .table th {
+            background: #f1f5f9;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+            color: var(--text);
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:hover {
+            background: rgba(30, 64, 175, 0.02);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-green {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-orange {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .badge-red {
+            background: #fecaca;
+            color: #7f1d1d;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            border-left-color: var(--success);
+            color: #15803d;
+        }
+
+        .alert-error {
+            background: #fecaca;
+            border-left-color: var(--danger);
+            color: #7f1d1d;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-left-color: var(--primary);
+            color: #1e40af;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">🏠 Rheinklar</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" onclick="showPage('login')">🔐 Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="showPage('dashboard')">📊 Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="showPage('tasks')">📋 Aufträge</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="showPage('invoices')">💰 Rechnungen</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="showPage('employees')">👥 Mitarbeiter</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="showPage('profile')">⚙️ Profil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="logout()" style="margin-top: 20px;">🚪 Logout</a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Login Page -->
+            <div id="login-page" class="page">
+                <div class="header">
+                    <h1>🏠 Rheinklar Hauswartungs-App</h1>
+                </div>
+
+                <div class="card" style="max-width: 400px;">
+                    <h2>Willkommen</h2>
+
+                    <div class="alert alert-info">
+                        <strong>Demo Mode:</strong> Wählen Sie eine Rolle um die App zu testen
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rollen zum Testen</label>
+                        <select id="demoRole" onchange="updateDemoUser()">
+                            <option value="">-- Wählen Sie eine Rolle --</option>
+                            <option value="customer">👤 Kunde</option>
+                            <option value="employee">👨‍💼 Mitarbeiter</option>
+                            <option value="admin">👑 Admin</option>
+                            <option value="partner">🤝 Partner</option>
+                        </select>
+                    </div>
+
+                    <div id="demoUsers"></div>
+
+                    <button class="success" onclick="demoLogin()">Demo Starten</button>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page" style="display: none;">
+                <div class="header">
+                    <h1>📊 Dashboard</h1>
+                    <div class="user-info" id="currentUser"></div>
+                </div>
+
+                <div id="dashboardContent"></div>
+            </div>
+
+            <!-- Tasks Page -->
+            <div id="tasks-page" class="page" style="display: none;">
+                <div class="header">
+                    <h1>📋 Aufträge</h1>
+                </div>
+
+                <div class="card">
+                    <h2>Auftragsübersicht</h2>
+                    <div id="tasksContent"></div>
+                </div>
+            </div>
+
+            <!-- Invoices Page -->
+            <div id="invoices-page" class="page" style="display: none;">
+                <div class="header">
+                    <h1>💰 Rechnungen</h1>
+                </div>
+
+                <div class="card">
+                    <h2>Ihre Rechnungen</h2>
+                    <div id="invoicesContent"></div>
+                </div>
+            </div>
+
+            <!-- Employees Page -->
+            <div id="employees-page" class="page" style="display: none;">
+                <div class="header">
+                    <h1>👥 Mitarbeiterverwaltung</h1>
+                </div>
+
+                <div class="card">
+                    <h2>Mitarbeiter</h2>
+                    <div id="employeesContent"></div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile-page" class="page" style="display: none;">
+                <div class="header">
+                    <h1>⚙️ Profil</h1>
+                </div>
+
+                <div class="card" style="max-width: 600px;">
+                    <h2>Profilbearbeitung</h2>
+                    <div id="profileContent"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mock Data & State Management
+        let currentUser = null;
+        let mockData = {
+            customers: [
+                { id: '1', name: 'Max Müller', email: 'max@example.ch', phone: '0791234567', invoices: 3, status: 'active' },
+                { id: '2', name: 'Anna Schmidt', email: 'anna@example.ch', phone: '0791234568', invoices: 1, status: 'active' }
+            ],
+            employees: [
+                { id: '1', name: 'Peter Jung', email: 'peter@rheinklar.ch', phone: '0791111111', status: 'online', tasks: 5 },
+                { id: '2', name: 'Maria König', email: 'maria@rheinklar.ch', phone: '0791111112', status: 'online', tasks: 3 }
+            ],
+            tasks: [
+                { id: '1', title: 'Rohrbruch reparieren', customer: 'Max Müller', employee: 'Peter Jung', status: 'completed', hours: 2.5 },
+                { id: '2', title: 'Fenster abdichten', customer: 'Anna Schmidt', employee: 'Maria König', status: 'in_progress', hours: 1.5 }
+            ],
+            invoices: [
+                { id: '1', customer: 'Max Müller', amount: 345.50, status: 'read', date: '2024-10-01' },
+                { id: '2', customer: 'Anna Schmidt', amount: 125.00, status: 'sent', date: '2024-10-05' }
+            ]
+        };
+
+        // Demo Users
+        const demoUsers = {
+            customer: { name: 'Max Müller', email: 'max@example.ch', role: 'customer' },
+            employee: { name: 'Peter Jung', email: 'peter@rheinklar.ch', role: 'employee' },
+            admin: { name: 'Admin User', email: 'admin@rheinklar.ch', role: 'admin' },
+            partner: { name: 'Partner GmbH', email: 'partner@rheinklar.ch', role: 'partner' }
+        };
+
+        function updateDemoUser() {
+            const role = document.getElementById('demoRole').value;
+            const html = role ? `
+                <div class="alert alert-success">
+                    <strong>${demoUsers[role].name}</strong><br>
+                    ${demoUsers[role].email}
+                </div>
+            ` : '';
+            document.getElementById('demoUsers').innerHTML = html;
+        }
+
+        function demoLogin() {
+            const role = document.getElementById('demoRole').value;
+            if (!role) return alert('Bitte wählen Sie eine Rolle');
+
+            currentUser = { ...demoUsers[role] };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            showPage('dashboard');
+            updateCurrentUser();
+        }
+
+        function updateCurrentUser() {
+            if (!currentUser) return;
+            const el = document.getElementById('currentUser');
+            el.innerHTML = `<div>${currentUser.name}<br><small>${currentUser.role.toUpperCase()}</small></div>`;
+            loadDashboard();
+        }
+
+        function showPage(pageName) {
+            if (!currentUser && pageName !== 'login') {
+                showPage('login');
+                return;
+            }
+
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            document.getElementById(pageName + '-page').style.display = 'block';
+
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            event?.target?.classList.add('active');
+
+            if (pageName === 'dashboard') loadDashboard();
+            if (pageName === 'tasks') loadTasks();
+            if (pageName === 'invoices') loadInvoices();
+            if (pageName === 'employees') loadEmployees();
+            if (pageName === 'profile') loadProfile();
+        }
+
+        function loadDashboard() {
+            let html = '';
+
+            if (currentUser.role === 'admin') {
+                html = `
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">24</div>
+                            <div class="stat-label">Offene Aufträge</div>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Ausstehende Rechnungen</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-number">18</div>
+                            <div class="stat-label">Mitarbeiter online</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">92%</div>
+                            <div class="stat-label">Kundenzufriedenheit</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>Neueste Aktivitäten</h2>
+                        <table class="table">
+                            <thead><tr><th>Auftrag</th><th>Kunde</th><th>Status</th><th>Aktion</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td>#AUF-001</td>
+                                    <td>Max Müller</td>
+                                    <td><span class="badge badge-green">Abgeschlossen</span></td>
+                                    <td><button class="secondary" style="padding: 6px 12px;">Ansehen</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else if (currentUser.role === 'employee') {
+                html = `
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Heute Aufträge</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-number">7.5h</div>
+                            <div class="stat-label">Diese Woche gearbeitet</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Oben</div>
+                            <div class="stat-label">Piketdienst Status</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>Meine Aufträge heute</h2>
+                        <table class="table">
+                            <thead><tr><th>Auftrag</th><th>Adresse</th><th>Zeit</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td>Rohrbruch</td>
+                                    <td>Hauptstr. 123</td>
+                                    <td>09:00 - 11:30</td>
+                                    <td><span class="badge badge-green">Abgeschlossen</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else if (currentUser.role === 'customer') {
+                html = `
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">Aktive Aufträge</div>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-number">1</div>
+                            <div class="stat-label">Ausstehende Rechnungen</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-number">Aktiv</div>
+                            <div class="stat-label">Mietvertrag</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>Ihre neuesten Aufträge</h2>
+                        <table class="table">
+                            <thead><tr><th>Auftrag</th><th>Mitarbeiter</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td>Rohrbruch reparieren</td>
+                                    <td>Peter Jung</td>
+                                    <td><span class="badge badge-green">Abgeschlossen</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            document.getElementById('dashboardContent').innerHTML = html;
+        }
+
+        function loadTasks() {
+            let html = '<table class="table"><thead><tr><th>Titel</th><th>Kunde</th><th>Status</th><th>Stunden</th></tr></thead><tbody>';
+
+            mockData.tasks.forEach(task => {
+                const statusClass = task.status === 'completed' ? 'badge-green' : 'badge-blue';
+                html += `
+                    <tr>
+                        <td>${task.title}</td>
+                        <td>${task.customer}</td>
+                        <td><span class="badge ${statusClass}">${task.status === 'completed' ? 'Abgeschlossen' : 'In Bearbeitung'}</span></td>
+                        <td>${task.hours}h</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('tasksContent').innerHTML = html;
+        }
+
+        function loadInvoices() {
+            let html = '<table class="table"><thead><tr><th>Kundename</th><th>Betrag</th><th>Status</th><th>Datum</th></tr></thead><tbody>';
+
+            mockData.invoices.forEach(inv => {
+                const statusClass = inv.status === 'read' ? 'badge-green' : 'badge-orange';
+                html += `
+                    <tr>
+                        <td>${inv.customer}</td>
+                        <td>CHF ${inv.amount.toFixed(2)}</td>
+                        <td><span class="badge ${statusClass}">${inv.status === 'read' ? 'Gelesen' : 'Versendet'}</span></td>
+                        <td>${inv.date}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('invoicesContent').innerHTML = html;
+        }
+
+        function loadEmployees() {
+            let html = '<table class="table"><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Aufträge</th></tr></thead><tbody>';
+
+            mockData.employees.forEach(emp => {
+                html += `
+                    <tr>
+                        <td>${emp.name}</td>
+                        <td>${emp.email}</td>
+                        <td><span class="badge badge-green">${emp.status === 'online' ? 'Online' : 'Offline'}</span></td>
+                        <td>${emp.tasks}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('employeesContent').innerHTML = html;
+        }
+
+        function loadProfile() {
+            const html = `
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" value="${currentUser.name}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" value="${currentUser.email}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Rolle</label>
+                    <input type="text" value="${currentUser.role.toUpperCase()}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Sprache</label>
+                    <select>
+                        <option selected>Deutsch</option>
+                        <option>Français</option>
+                        <option>English</option>
+                    </select>
+                </div>
+                <div class="button-group">
+                    <button class="success">Speichern</button>
+                    <button class="secondary">Abbrechen</button>
+                </div>
+            `;
+            document.getElementById('profileContent').innerHTML = html;
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            showPage('login');
+            document.getElementById('demoRole').value = '';
+            document.getElementById('demoUsers').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
