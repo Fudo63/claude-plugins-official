@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rheinklar - Professional Facility Management</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #1e40af;
+            --secondary: #0891b2;
+            --success: #16a34a;
+            --warning: #ea580c;
+            --danger: #dc2626;
+            --bg: #f9fafb;
+            --surface: #ffffff;
+            --text: #111827;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* LAYOUT */
+        .layout {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 10px 12px;
+            margin-bottom: 4px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            background: var(--bg);
+            border-left-color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, rgba(30,64,175,0.1) 0%, rgba(8,145,178,0.05) 100%);
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* PAGE HEADER */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transform: translateY(-4px);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* TABLES */
+        .data-card {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 2px solid var(--border);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-content {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--bg);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+            font-size: 13px;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: var(--bg);
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(22,163,74,0.1);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(234,88,12,0.1);
+            color: var(--warning);
+        }
+
+        .badge-info {
+            background: rgba(30,64,175,0.1);
+            color: var(--primary);
+        }
+
+        /* BUTTONS */
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                position: static;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px 12px;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">🏠 Rheinklar</div>
+        <div class="nav-actions">
+            <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+
+    <!-- LAYOUT -->
+    <div class="layout">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="nav-section">
+                <div class="nav-title">MAIN</div>
+                <a class="nav-link active" onclick="showPage('dashboard', this)">📊 Dashboard</a>
+                <a class="nav-link" onclick="showPage('buildings', this)">🏢 Gebäude</a>
+                <a class="nav-link" onclick="showPage('tasks', this)">📋 Aufträge</a>
+                <a class="nav-link" onclick="showPage('inspections', this)">🔍 Inspektionen</a>
+                <a class="nav-link" onclick="showPage('calendar', this)">📅 Kalender</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">SETTINGS</div>
+                <a class="nav-link" onclick="showPage('settings', this)">⚙️ Einstellungen</a>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main">
+            <!-- DASHBOARD PAGE -->
+            <div id="dashboard" class="page active">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Dashboard</div>
+                        <div class="page-subtitle">Willkommen zur professionellen Facility Management App</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-number">24</div>
+                        <div class="stat-label">Offene Aufträge</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--warning);">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Überfällig</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--success);">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-number">142</div>
+                        <div class="stat-label">Diesen Monat abgeschlossen</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--secondary);">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-number">18</div>
+                        <div class="stat-label">Aktive Mitarbeiter</div>
+                    </div>
+                </div>
+
+                <div class="data-card">
+                    <div class="card-header">📊 Aktuelle Aktivitäten</div>
+                    <div class="card-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Auftrag</th>
+                                    <th>Gebäude</th>
+                                    <th>Mitarbeiter</th>
+                                    <th>Status</th>
+                                    <th>Priorität</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>#AUF-2024-001</strong> Heizung reparieren</td>
+                                    <td>Hauptstr. 123, Zürich</td>
+                                    <td>Peter Jung</td>
+                                    <td><span class="badge badge-info">In Bearbeitung</span></td>
+                                    <td><span class="badge badge-warning">Hoch</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>#AUF-2024-002</strong> Fenster abdichten</td>
+                                    <td>Dorfstr. 45, Basel</td>
+                                    <td>Maria König</td>
+                                    <td><span class="badge badge-success">Abgeschlossen</span></td>
+                                    <td>Mittel</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>#AUF-2024-003</strong> Elektrische Inspektion</td>
+                                    <td>Bergstr. 78, Bern</td>
+                                    <td>Offen</td>
+                                    <td><span class="badge badge-info">Zugewiesen</span></td>
+                                    <td>Kritisch</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BUILDINGS PAGE -->
+            <div id="buildings" class="page">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Gebäude</div>
+                        <div class="page-subtitle">Verwalte alle Ihre Liegenschaften</div>
+                    </div>
+                    <button class="btn-primary">+ Neues Gebäude</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🏢</div>
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Gebäude</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏠</div>
+                        <div class="stat-number">142</div>
+                        <div class="stat-label">Wohnungen</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚙️</div>
+                        <div class="stat-number">238</div>
+                        <div class="stat-label">Anlagen</div>
+                    </div>
+                </div>
+
+                <div class="data-card">
+                    <div class="card-header">🏢 Gebäudeübersicht</div>
+                    <div class="card-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Gebäude</th>
+                                    <th>Adresse</th>
+                                    <th>Wohnungen</th>
+                                    <th>Manager</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Hauptgebäude Zürich</strong></td>
+                                    <td>Hauptstr. 123, 8000 Zürich</td>
+                                    <td>24</td>
+                                    <td>Hans Meier</td>
+                                    <td><span class="badge badge-success">Aktiv</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Neubau Basel</strong></td>
+                                    <td>Dorfstr. 45, 4000 Basel</td>
+                                    <td>18</td>
+                                    <td>Anna Schmidt</td>
+                                    <td><span class="badge badge-success">Aktiv</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Altes Haus Bern</strong></td>
+                                    <td>Bergstr. 78, 3000 Bern</td>
+                                    <td>12</td>
+                                    <td>Klaus Weber</td>
+                                    <td><span class="badge badge-info">Wartung</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TASKS PAGE -->
+            <div id="tasks" class="page">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Aufträge</div>
+                        <div class="page-subtitle">Alle Aufträge und Tickets im Überblick</div>
+                    </div>
+                    <button class="btn-primary">+ Neuer Auftrag</button>
+                </div>
+
+                <div class="data-card">
+                    <div class="card-header">📋 Aktive Aufträge</div>
+                    <div class="card-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Auftrag ID</th>
+                                    <th>Titel</th>
+                                    <th>Gebäude</th>
+                                    <th>Zugewiesen an</th>
+                                    <th>Priorität</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#AUF-2024-001</td>
+                                    <td>Heizung reparieren</td>
+                                    <td>Hauptstr. 123</td>
+                                    <td>Peter Jung</td>
+                                    <td><span class="badge badge-warning">Hoch</span></td>
+                                    <td><span class="badge badge-info">In Bearbeitung</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#AUF-2024-002</td>
+                                    <td>Fenster abdichten</td>
+                                    <td>Dorfstr. 45</td>
+                                    <td>Maria König</td>
+                                    <td>Mittel</td>
+                                    <td><span class="badge badge-success">Abgeschlossen</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INSPECTIONS PAGE -->
+            <div id="inspections" class="page">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Inspektionen</div>
+                        <div class="page-subtitle">Übersicht aller Inspektionen und Wartungen</div>
+                    </div>
+                </div>
+
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔍</div>
+                    <div class="empty-state-title">Inspektionen-Modul</div>
+                    <p>Professionelles Inspektions-Management mit Checklisten, Foto-Dokumentation und Mängelkatalog</p>
+                </div>
+            </div>
+
+            <!-- CALENDAR PAGE -->
+            <div id="calendar" class="page">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Kalender</div>
+                        <div class="page-subtitle">Planen Sie Ihre Aufträge und Termine</div>
+                    </div>
+                </div>
+
+                <div class="empty-state">
+                    <div class="empty-state-icon">📅</div>
+                    <div class="empty-state-title">Kalender & Planung</div>
+                    <p>Visuelle Planung mit Kapazitätsmanagement und Ressourcenoptimierung</p>
+                </div>
+            </div>
+
+            <!-- SETTINGS PAGE -->
+            <div id="settings" class="page">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Einstellungen</div>
+                        <div class="page-subtitle">Verwalten Sie Ihre Account-Einstellungen</div>
+                    </div>
+                </div>
+
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚙️</div>
+                    <div class="empty-state-title">Einstellungen</div>
+                    <p>Benutzerprofil, Benachrichtigungen, Sicherheit und mehr</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showPage(pageId, element) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+            // Remove active from nav links
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+            // Show selected page and mark nav as active
+            document.getElementById(pageId).classList.add('active');
+            if (element) element.classList.add('active');
+        }
+
+        function logout() {
+            alert('Logout functionality - Ready for implementation');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rheinklar App - Demo & Testing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e40af 0%, #0891b2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .status-item.online::before {
+            content: "●";
+            color: #16a34a;
+            font-size: 20px;
+        }
+
+        .status-item.offline::before {
+            content: "●";
+            color: #dc2626;
+            font-size: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #1e40af;
+            color: white;
+            border-color: #1e40af;
+        }
+
+        .tab-btn:hover {
+            border-color: #1e40af;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1e40af;
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #1e40af;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button.secondary {
+            background: #64748b;
+        }
+
+        button.success {
+            background: #16a34a;
+        }
+
+        .results {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+
+        .success {
+            color: #16a34a;
+        }
+
+        .info {
+            color: #1e40af;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .api-status {
+            background: #f0f9ff;
+            border-left: 4px solid #0891b2;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 Rheinklar Hauswartungs-App</h1>
+            <p>Interaktive Demo & Testing Console</p>
+            <div class="status">
+                <div class="status-item online">Backend Connected</div>
+                <div class="status-item online">Database Active</div>
+                <div id="authStatus" class="status-item offline">Not Authenticated</div>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('auth')">🔐 Authentication</button>
+            <button class="tab-btn" onclick="switchTab('customer')">👤 Customer</button>
+            <button class="tab-btn" onclick="switchTab('employee')">👨‍💼 Employee</button>
+            <button class="tab-btn" onclick="switchTab('admin')">👑 Admin</button>
+            <button class="tab-btn" onclick="switchTab('tasks')">📋 Tasks</button>
+            <button class="tab-btn" onclick="switchTab('invoices')">💰 Invoices</button>
+        </div>
+
+        <!-- Authentication Tab -->
+        <div id="auth" class="tab-content active">
+            <h2>Authentication & User Management</h2>
+
+            <div class="api-status">
+                <strong>API URL:</strong> http://localhost:5000/api
+            </div>
+
+            <div class="two-column">
+                <div>
+                    <h3>Register User</h3>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="regEmail" placeholder="user@rheinklar.ch">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="regPassword" placeholder="Password123!">
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="regName" placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select id="regRole">
+                            <option value="customer">Customer (Kunde)</option>
+                            <option value="employee">Employee (Mitarbeiter)</option>
+                            <option value="admin">Admin</option>
+                            <option value="partner">Partner</option>
+                        </select>
+                    </div>
+                    <button onclick="register()">Register</button>
+                </div>
+
+                <div>
+                    <h3>Login</h3>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" placeholder="user@rheinklar.ch">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="Password123!">
+                    </div>
+                    <button onclick="login()">Login</button>
+                    <button class="secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="results" id="authResults"></div>
+        </div>
+
+        <!-- Customer Tab -->
+        <div id="customer" class="tab-content">
+            <h2>Customer Dashboard</h2>
+
+            <div class="button-group">
+                <button onclick="getCustomerProfile()">Get Profile</button>
+                <button onclick="getCustomerInvoices()">View Invoices</button>
+                <button onclick="getCustomerTasks()">View Tasks</button>
+            </div>
+
+            <div class="results" id="customerResults"></div>
+        </div>
+
+        <!-- Employee Tab -->
+        <div id="employee" class="tab-content">
+            <h2>Employee Dashboard</h2>
+
+            <div class="button-group">
+                <button onclick="getEmployeeProfile()">Get Profile</button>
+                <button onclick="getEmployeeTasks()">View Tasks</button>
+                <button onclick="updateEmployeeStatus()">Toggle On-Duty</button>
+            </div>
+
+            <div class="results" id="employeeResults"></div>
+        </div>
+
+        <!-- Admin Tab -->
+        <div id="admin" class="tab-content">
+            <h2>Admin Dashboard</h2>
+
+            <div class="button-group">
+                <button onclick="getAdminStats()">Get Stats</button>
+                <button onclick="getEmployeesList()">View Employees</button>
+                <button onclick="createEmployee()">Create Employee</button>
+            </div>
+
+            <div class="results" id="adminResults"></div>
+        </div>
+
+        <!-- Tasks Tab -->
+        <div id="tasks" class="tab-content">
+            <h2>Task Management</h2>
+
+            <div>
+                <h3>Create Task</h3>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="taskTitle" placeholder="e.g., Pipe Repair">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="taskDesc" placeholder="Task description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Budget Hours</label>
+                    <input type="number" id="taskHours" placeholder="2" min="0.5" step="0.5">
+                </div>
+                <button onclick="createTask()">Create Task</button>
+            </div>
+
+            <div class="results" id="taskResults"></div>
+        </div>
+
+        <!-- Invoices Tab -->
+        <div id="invoices" class="tab-content">
+            <h2>Invoice Management</h2>
+
+            <div class="button-group">
+                <button onclick="getInvoices()">View Invoices</button>
+                <button onclick="markInvoiceAsRead()">Mark as Read</button>
+            </div>
+
+            <div class="results" id="invoiceResults"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let authToken = localStorage.getItem('authToken');
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const typeMap = { error: '❌', success: '✅', info: 'ℹ️' };
+            return `[${timestamp}] ${typeMap[type]} ${message}`;
+        }
+
+        async function register() {
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const fullName = document.getElementById('regName').value;
+            const role = document.getElementById('regRole').value;
+
+            if (!email || !password || !fullName) {
+                return appendResult('authResults', log('Missing fields', 'error'));
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, fullName, role })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    authToken = data.accessToken;
+                    localStorage.setItem('authToken', authToken);
+                    updateAuthStatus();
+                    appendResult('authResults', log(`User registered: ${email}`, 'success'));
+                    appendResult('authResults', log(`Token: ${authToken.substring(0, 20)}...`, 'info'));
+                } else {
+                    appendResult('authResults', log(`Error: ${data.error}`, 'error'));
+                }
+            } catch (err) {
+                appendResult('authResults', log(`Connection error: ${err.message}`, 'error'));
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                return appendResult('authResults', log('Email and password required', 'error'));
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    authToken = data.accessToken;
+                    localStorage.setItem('authToken', authToken);
+                    updateAuthStatus();
+                    appendResult('authResults', log(`Logged in as ${data.role}`, 'success'));
+                } else {
+                    appendResult('authResults', log(`Login failed: ${data.error}`, 'error'));
+                }
+            } catch (err) {
+                appendResult('authResults', log(`Connection error: ${err.message}`, 'error'));
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            localStorage.removeItem('authToken');
+            updateAuthStatus();
+            appendResult('authResults', log('Logged out', 'success'));
+        }
+
+        function updateAuthStatus() {
+            const status = document.getElementById('authStatus');
+            if (authToken) {
+                status.textContent = '✓ Authenticated';
+                status.classList.add('online');
+                status.classList.remove('offline');
+            } else {
+                status.textContent = '✗ Not Authenticated';
+                status.classList.add('offline');
+                status.classList.remove('online');
+            }
+        }
+
+        async function getCustomerProfile() {
+            if (!authToken) return appendResult('customerResults', log('Not authenticated', 'error'));
+
+            try {
+                const res = await fetch(`${API_URL}/users/profile`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    appendResult('customerResults', log('Profile loaded', 'success'));
+                    appendResult('customerResults', JSON.stringify(data, null, 2));
+                } else {
+                    appendResult('customerResults', log(`Error: ${data.error}`, 'error'));
+                }
+            } catch (err) {
+                appendResult('customerResults', log(`Error: ${err.message}`, 'error'));
+            }
+        }
+
+        async function getCustomerInvoices() {
+            if (!authToken) return appendResult('customerResults', log('Not authenticated', 'error'));
+
+            try {
+                const res = await fetch(`${API_URL}/invoices`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await res.json();
+                appendResult('customerResults', log(`Found ${data.length} invoices`, 'success'));
+                appendResult('customerResults', JSON.stringify(data, null, 2));
+            } catch (err) {
+                appendResult('customerResults', log(`Error: ${err.message}`, 'error'));
+            }
+        }
+
+        async function getAdminStats() {
+            if (!authToken) return appendResult('adminResults', log('Not authenticated', 'error'));
+
+            try {
+                const res = await fetch(`${API_URL}/admin/stats`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    appendResult('adminResults', log('Dashboard stats loaded', 'success'));
+                    appendResult('adminResults', JSON.stringify(data, null, 2));
+                } else {
+                    appendResult('adminResults', log(`Error: ${data.error}`, 'error'));
+                }
+            } catch (err) {
+                appendResult('adminResults', log(`Error: ${err.message}`, 'error'));
+            }
+        }
+
+        function appendResult(elementId, text) {
+            const el = document.getElementById(elementId);
+            el.textContent += (el.textContent ? '\n\n' : '') + text;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        // Initialize
+        updateAuthStatus();
+    </script>
+</body>
+</html>
