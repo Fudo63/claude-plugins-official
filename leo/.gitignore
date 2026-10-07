@@ -1,0 +1,33 @@
+# ── Secrets ──────────────────────────────────
+config.local.js
+jarvis-agent/.env
+.env
+*.pem
+*.key
+
+# ── Dependencies ─────────────────────────────
+node_modules/
+package-lock.json
+jarvis-agent/package-lock.json
+
+# ── Binaries / large files ──────────────────
+cloudflared.exe
+*.exe
+*.dmg
+*.zip
+
+# ── Playwright browser profile (user-specific) ──
+.jarvis-browser-profile/
+
+# ── OS / editor cruft ────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Logs ─────────────────────────────────────
+*.log
+npm-debug.log*

@@ -1,0 +1,19 @@
+{
+  "name": "leo-agent",
+  "version": "1.0.0",
+  "description": "J.A.R.V.I.S. local agent — computer control server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "js-yaml": "^4.1.0",
+    "open": "^8.4.2",
+    "playwright": "^1.49.0",
+    "screenshot-desktop": "^1.12.7",
+    "ws": "^8.17.0"
+  }
+}
