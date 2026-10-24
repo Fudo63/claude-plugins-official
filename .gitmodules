@@ -1,0 +1,3 @@
+[submodule "external_plugins/rea"]
+	path = external_plugins/rea
+	url = https://github.com/morluto/rea.git
